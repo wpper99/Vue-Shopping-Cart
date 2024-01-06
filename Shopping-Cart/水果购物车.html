@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/inputnumber.css" />
+    <link rel="stylesheet" href="./css/index.css" />
+    <title>购物车</title>
+  </head>
+  <body>
+    <div class="app-container" id="app">
+      <!-- 顶部banner -->
+      <div class="banner-box"><img src="./img/fruit.jpg" alt="" /></div>
+      <!-- 面包屑 -->
+      <div class="breadcrumb">
+        <span>🏠</span>
+        /
+        <span>购物车</span>
+      </div>
+      <!-- 购物车主体 -->
+      <div class="main" v-if="fruitList.length > 0">
+        <div class="table">
+          <!-- 头部 -->
+          <div class="thead">
+            <div class="tr">
+              <div class="th">选中</div>
+              <div class="th th-pic">图片</div>
+              <div class="th">单价</div>
+              <div class="th num-th">个数</div>
+              <div class="th">小计</div>
+              <div class="th">操作</div>
+            </div>
+          </div>
+          <!-- 身体 -->
+          <div class="tbody">
+            <div class="tr" :class="{ active: item.isChecked }" v-for="(item, index) in fruitList" :key="item.id">
+              <div class="td"><input type="checkbox" v-model="item.isChecked"/></div>
+              <div class="td"><img :src="item.icon" alt="" /></div>
+              <div class="td">{{ item.price }}</div>
+              <div class="td">
+                <div class="my-input-number">
+                  <button :disabled="item.num <= 1" class="decrease" @click="sub(item.id)"> - </button>
+                  <span class="my-input__inner">{{ item.num }}</span>
+                  <button class="increase" @click="add(item.id)"> + </button>
+                </div>
+              </div>
+              <div class="td">{{ item.num * item.price }}</div>
+              <div class="td"><button @click="del(item.id)">删除</button></div>
+            </div>
+
+
+          </div>
+        </div>
+        <!-- 底部 -->
+        <div class="bottom">
+          <!-- 全选 -->
+          <label class="check-all">
+            <input type="checkbox" v-model="isAll"/>
+            全选
+          </label>
+          <div class="right-box">
+            <!-- 所有商品总价 -->
+            <span class="price-box">总价&nbsp;&nbsp;:&nbsp;&nbsp;¥&nbsp;<span class="price">{{ totalPrice }}</span></span>
+            <!-- 结算按钮 -->
+            <button class="pay">结算( {{ totalCount }} )</button>
+          </div>
+        </div>
+      </div>
+      <!-- 空车 -->
+      <div class="empty" v-else>🛒暂无订单</div>
+    </div>
+    <script src="./js/vue.js"></script>
+    <script>
+      const app = new Vue({
+        el: '#app',
+        data: {
+          // 水果列表
+          fruitList: [
+            {
+              id: 1,
+              icon: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.WXCEh4lKuxWbRBj2DDjfXwHaE_?w=302&h=204&c=7&r=0&o=5&dpr=1.3&pid=1.7',
+              isChecked: true,
+              num: 2,
+              price: 6,
+            },
+            {
+              id: 2,
+              icon: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.mNc3TE8X1s4F967GZNMxaQHaHa?w=192&h=192&c=7&r=0&o=5&dpr=1.3&pid=1.7',
+              isChecked: false,
+              num: 7,
+              price: 20,
+            },
+            {
+              id: 3,
+              icon: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.eLHIyZHYVJc3aCQUX9TRGwHaEy?w=284&h=184&c=7&r=0&o=5&dpr=1.3&pid=1.7',
+              isChecked: true,
+              num: 3,
+              price: 40,
+            },
+            {
+              id: 4,
+              icon: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.ZPFDKWt4FVZpbPfDV56EQQHaHa?w=206&h=206&c=7&r=0&o=5&dpr=1.3&pid=1.7',
+              isChecked: false,
+              num: 10,
+              price: 3,
+            },
+            {
+              id: 5,
+              icon: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.EIg3q1KPqWWvv_GRlVWNlwHaIN?w=182&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7',
+              isChecked: true,
+              num: 20,
+              price: 34,
+            },
+          ],
+        },
+        // 注意computed里的计算属性虽然时函数写法，但仍然是属性
+        computed:{
+            // computed有缓存机制，变量值不变，直接返回结果，不用像menthods重复调用函数
+            // 简单写法,仅有获取，不能设置
+            // isAll (){
+            //     return this.fruitList.every(item => item.isChecked === true)
+            // }
+            // 完整写法：get + set
+            isAll :{
+                get() {
+                    return this.fruitList.every(item => item.isChecked === true)
+                },
+                set(value) {
+                    this.fruitList.forEach(item => item.isChecked = value)
+                }
+            },
+            totalCount() {
+                return this.fruitList.reduce((sum , item) => {
+                    // 仅统计勾选的水果
+                    if(item.isChecked === true){
+                        return sum + item.num
+                    }
+                    else{
+                        return sum
+                    }
+                } , 0)
+            },
+            totalPrice() {
+                // return this.fruitList.reduce((sum , item) => xxx , 0)
+                return this.fruitList.reduce((sum , item) => {
+                    if(item.isChecked === true){
+                        return sum + item.num * item.price
+                    }
+                    else{
+                        return sum
+                    }
+                } , 0)
+            }
+        },
+        methods :{
+            del(id){
+             this.fruitList = this.fruitList.filter(item => item.id !== id )
+            },
+            sub(id) {
+                const fruit = this.fruitList.find(item => item.id === id)
+                fruit.num--
+            },
+            add(id) {
+                const fruit =this.fruitList.find(item => item.id === id)
+                fruit.num++
+            }
+        }
+      })
+    </script>
+  </body>
+</html>
