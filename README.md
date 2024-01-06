@@ -29,3 +29,6 @@
 5.统计 选中的 总价 和 总数量 ：通过计算属性来计算**选中的**总价和总数量
 
 ## 三、实现购物车效果
+
+![Image text](https://github.com/wpper99/Vue-Shopping-Cart/blob/master/Shopping-Cart/img/%E8%B4%AD%E7%89%A9%E8%BD%A6.png)
+
